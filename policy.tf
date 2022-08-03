@@ -112,3 +112,55 @@ data "aws_iam_policy_document" "eks_key" {
     }
   }
 }
+
+
+data "aws_iam_policy_document" "irsa_aws_node_cni" {
+  statement {
+    sid           = "EksAwsNodeIrsa"
+    actions       = ["sts:AssumeRoleWithWebIdentity"]
+    effect        = "Allow"
+
+    principals    {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.workhorse.arn]
+    }
+
+    # Requestor authenticated with service account named "aws-node" in namespace "kube-system"
+    condition     {
+      test        = "StringEquals"
+      variable    = "${replace(aws_iam_openid_connect_provider.workhorse.url, "https://", "")}:sub"
+      values      = ["system:serviceaccount:kube-system:aws-node"]
+    }
+
+    condition     {
+      test        = "StringEquals"
+      variable    = "${replace(aws_iam_openid_connect_provider.workhorse.url, "https://", "")}:aud"
+      values      = ["sts.amazonaws.com"]
+    }
+  }
+}
+
+
+data "aws_iam_policy_document" "cni_ip6" {
+  statement {
+    sid       = "EksIp6"
+    actions   = [
+      "ec2:AssignIpv6Addresses",
+      "ec2:DescribeInstances",
+      "ec2:DescribeTags",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DescribeInstanceTypes",
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+
+  statement {
+    sid       = "EksIp6Tags"
+    actions   = [
+      "ec2:CreateTags",
+    ]
+    effect    = "Allow"
+    resources = ["arn:aws:ec2:*:*:network-interface/*"]
+  }
+}

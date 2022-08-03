@@ -28,3 +28,14 @@ resource "aws_iam_role" "eks_minion" {
     data.aws_iam_policy.eks_ecr.arn,
   ]
 }
+
+
+resource "aws_iam_role" "eks_cni_ip6" {
+  name                = "eks-cni-ip6"
+  assume_role_policy  = data.aws_iam_policy_document.irsa_aws_node_cni.json
+
+  inline_policy {
+    name        = "eks-cni-ip6"
+    policy      = data.aws_iam_policy_document.cni_ip6.json
+  }
+}
