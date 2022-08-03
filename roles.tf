@@ -27,6 +27,11 @@ resource "aws_iam_role" "eks_minion" {
     data.aws_iam_policy.eks_cni.arn,
     data.aws_iam_policy.eks_ecr.arn,
   ]
+
+  inline_policy {
+    name        = "eks-cni-ip6"
+    policy      = data.aws_iam_policy_document.cni_ip6.json
+  }
 }
 
 
