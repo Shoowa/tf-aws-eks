@@ -8,6 +8,7 @@ data "aws_iam_policy_document" "eks_assume_role" {
       type        = "Service"
       identifiers = ["eks.amazonaws.com"]
     }
+
   }
 }
 
