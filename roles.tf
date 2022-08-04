@@ -44,3 +44,14 @@ resource "aws_iam_role" "eks_cni_ip6" {
     policy      = data.aws_iam_policy_document.cni_ip6.json
   }
 }
+
+
+resource "aws_iam_role" "lb_controller" {
+  name                = "irsa-lb-controller"
+  assume_role_policy  = data.aws_iam_policy_document.irsa_lb_controller.json
+
+  inline_policy {
+    name        = "lb-controller"
+    policy      = file("${path.module}/lb_controller.json")
+  }
+}

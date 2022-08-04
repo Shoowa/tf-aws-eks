@@ -165,3 +165,30 @@ data "aws_iam_policy_document" "cni_ip6" {
     resources = ["arn:aws:ec2:*:*:network-interface/*"]
   }
 }
+
+
+data "aws_iam_policy_document" "irsa_lb_controller" {
+  statement {
+    sid           = "EksLbController"
+    actions       = ["sts:AssumeRoleWithWebIdentity"]
+    effect        = "Allow"
+
+    principals    {
+      type        = "Federated"
+      identifiers = [aws_iam_openid_connect_provider.workhorse.arn]
+    }
+
+    # Requestor authenticated with service account named "aws-load-balancer-controller" in namespace "kube-system"
+    condition     {
+      test        = "StringEquals"
+      variable    = "${replace(aws_iam_openid_connect_provider.workhorse.url, "https://", "")}:sub"
+      values      = ["system:serviceaccount:kube-system:aws-load-balancer-controller"]
+    }
+
+    condition     {
+      test        = "StringEquals"
+      variable    = "${replace(aws_iam_openid_connect_provider.workhorse.url, "https://", "")}:aud"
+      values      = ["sts.amazonaws.com"]
+    }
+  }
+}
