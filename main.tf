@@ -41,7 +41,11 @@ resource "aws_eks_cluster" "workhorse" {
     }
   }
 
-  enabled_cluster_log_types = ["api", "audit"]
+  enabled_cluster_log_types = [
+    "api",
+    "audit",
+    "authenticator",
+  ]
 }
 
 
