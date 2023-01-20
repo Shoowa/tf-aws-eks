@@ -22,7 +22,18 @@ resource "aws_kms_grant" "eks-admin" {
   name              = "enable-network-changes"
   key_id            = aws_kms_key.workhorse.id
   grantee_principal = aws_iam_role.eks_admin.arn
-  operations        = ["DescribeKey"]
+  operations        = [
+    "DescribeKey",
+    "Decrypt",
+    "Encrypt",
+    "CreateGrant",
+    "GenerateDataKey",
+    "GenerateDataKeyWithoutPlaintext",
+    "GenerateDataKeyPair",
+    "GenerateDataKeyPairWithoutPlaintext",
+    "ReEncryptFrom",
+    "ReEncryptTo",
+  ]
 }
 
 
